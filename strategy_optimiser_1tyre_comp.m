@@ -9,7 +9,7 @@
 % a linear decline in pace each lap as the tyres wear.
 
 % For this, we will define the lap-time (pace) of the tyre for each lap,
-% let's assume a consistent 0.5s decline in pace each lap on the tyre.
+% let's assume a starting pace of 90s and a consistent 0.5s decline in pace each lap on the tyre.
 
 % We need to define the following:
 
@@ -18,7 +18,7 @@
 % lapTime: (n, n+0.5, n+1, ..., n+(49*0.5))
 % pitTime: 20s (After which, the tyreAge is 1 and grows linearly again.)
 
-% Objective (minimise over 50 laps) raceTime = total lap times + pit time.
+% Objective (minimise over 50 laps) raceTime = total lap times (including pit time).
 
 % Establish the logic such that we can choose to stop at any point, and 
 % only once, at which point the tyreAge returns to 1. (Expect therefore the
@@ -28,6 +28,13 @@ prob = optimproblem("Description","Single_Linear_Tyre_Pit_Lap","ObjectiveSense",
 
 % We need the solver to look at graphical plots for total race time when
 % pitting on Laps 1-49 and decide which option is fastest.
+
+% We can plot individual lap times against lap number and aim to minimise the integral of the function which is the total race time.
+
+% lapTime = 90 + 0.5(tyreAge - 1).
+
+% raceTime = integral of lapTime with respect to tyreAge.
+
 
 
 
