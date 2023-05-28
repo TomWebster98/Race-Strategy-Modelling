@@ -24,13 +24,16 @@
 % only once, at which point the tyreAge returns to 1. (Expect therefore the
 % optimal stop to be at the half way point of the race.
 
+pitTime = 20;
+tyreAge = 1:50;
+%lapTime = 90 + 0.5.*(tyreAge-1);
+
 prob = optimproblem("Description","Single_Linear_Tyre_Pit_Lap","ObjectiveSense","minimize");
 
 % We need the solver to look at graphical plots for total race time when
 % pitting on Laps 1-49 and decide which option is fastest.
 
 % We can plot individual lap times against lap number and aim to minimise the integral of the function which is the total race time.
-
 % lapTime = 90 + 0.5(tyreAge - 1).
 
 % raceTime is the sum of the integrals of lapTime with respect to tyreAge for each stint + pitTime:
@@ -40,6 +43,11 @@ prob = optimproblem("Description","Single_Linear_Tyre_Pit_Lap","ObjectiveSense",
 % Our parameter to adjust is the pitLap, with the objective of minimising raceTime. 
 % (Expect pitLap = 25)
 
+pitLap = optimvar("pitLap");
 
+raceTimeTotal = pitTime + int(calculateLapTime(tyreAge),tyreAge,1,pitLap) + int(calculateLapTime(tyreAge),tyreAge,1,50-pitLap);
+%raceTimeTotal = pitTime + integral(calculateLapTime(tyreAge),1,pitLap) + integral(calculateLapTime(tyreAge),1,50-pitLap);
 
+prob.Objective = raceTimeTotal;
 
+[sol,optval] = solve(prob);
