@@ -33,10 +33,12 @@ prob = optimproblem("Description","Single_Linear_Tyre_Pit_Lap","ObjectiveSense",
 
 % lapTime = 90 + 0.5(tyreAge - 1).
 
-% raceTime = integral of lapTime with respect to tyreAge.
+% raceTime is the sum of the integrals of lapTime with respect to tyreAge for each stint + pitTime:
 
+% raceTime = pitTime + integral[lapTime d(tyreAge)]pitLap;1 + integral[lapTime d(tyreAge)]50-pitLap;1
 
-
+% Our parameter to adjust is the pitLap, with the objective of minimising raceTime. 
+% (Expect pitLap = 25)
 
 
 
