@@ -152,5 +152,5 @@ hold off
 
 % Sum fuel corrected stint times with the pit stop time to determine
 % overall race time.
-totalRaceTimeC5C5C4_sec = seconds(sum(c5TyreDegLaptime(tyreAge(1:pitLap1))) + sum(c5TyreDegLaptime(tyreAge(pitLap1:pitLap2))) + sum(c4TyreDegLaptime(tyreAge(1:(50-pitLap2)))) + (2.*pitTime))  %seconds
+totalRaceTimeC5C5C4_sec = seconds(sum(c5Fuel_Corrected_Stint1) + sum(c5Fuel_Corrected_Stint2) + sum(c4Fuel_Corrected_Stint) + (2.*pitTime))  %seconds
 totalRaceTimeC5C5C4_min = minutes(minutes(totalRaceTimeC5C5C4_sec))  %minutes
