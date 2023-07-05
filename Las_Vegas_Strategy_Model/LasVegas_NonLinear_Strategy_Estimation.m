@@ -101,6 +101,31 @@ hold off
 totalRaceTimeC5C4_sec = seconds(sum(c5Fuel_Corrected_Stint) + sum(c4Fuel_Corrected_Stint) + pitTime)  %seconds
 totalRaceTimeC5C4_min = minutes(minutes(totalRaceTimeC5C4_sec))
 %% 
+% Consider a single stop strategy, C5 to C3 (Soft to Hard).
+
+% Add slider to observe variable pitlap effects
+pitLap = 18;
+
+% Calculating fuel corrected stints
+c5Fuel_Corrected_Stint = c5Laptime(tyreAge(1:pitLap));
+c3Fuel_Corrected_Stint = c3TyreDegLaptime(tyreAge(1:(50-pitLap))) - fuelLapCorrections(lapNumber(pitLap+1:50));
+
+% Plotting lap times
+plot(lapNumber(1:pitLap), c5Fuel_Corrected_Stint,"Color","#D95319")
+hold on
+plot(lapNumber(pitLap+1:50), c3Fuel_Corrected_Stint,"Color","#000000")
+xline(pitLap,":")
+xlabel("Lap Number")
+ylabel("Fuel Corrected Lap Times (s)")
+title("C5 to C3 1 Stop Strategy")
+legend(["C5" "C3" "Pit Lap"],"Location","northeast")
+hold off
+
+% Sum fuel corrected stint times with the pit stop time to determine
+% overall race time.
+totalRaceTimeC5C3_sec = seconds(sum(c5Fuel_Corrected_Stint) + sum(c3Fuel_Corrected_Stint) + pitTime)  %seconds
+totalRaceTimeC5C3_min = minutes(minutes(totalRaceTimeC5C3_sec))
+%% 
 % Consider a single stop strategy. C4 to C3 (Medium to Hard).
 
 % Add slider to observe variable pitlap effects
@@ -154,3 +179,32 @@ hold off
 % overall race time.
 totalRaceTimeC5C5C4_sec = seconds(sum(c5Fuel_Corrected_Stint1) + sum(c5Fuel_Corrected_Stint2) + sum(c4Fuel_Corrected_Stint) + (2.*pitTime))  %seconds
 totalRaceTimeC5C5C4_min = minutes(minutes(totalRaceTimeC5C5C4_sec))  %minutes
+%% 
+% Consider a 2 stop strategy. C5, C4, C4 (Soft, Medium, Medium).
+
+% Add sliders to observe variable pitlap effects
+pitLap1 = 14;
+pitLap2 = 32;
+
+% Calculating fuel corrected stints
+c5Fuel_Corrected_Stint = c5Laptime(tyreAge(1:pitLap1));
+c4Fuel_Corrected_Stint1 = c4TyreDegLaptime(tyreAge(1:pitLap2-pitLap1)) - fuelLapCorrections(lapNumber(pitLap1+1:pitLap2));
+c4Fuel_Corrected_Stint2 = c4TyreDegLaptime(tyreAge(1:(50-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:50));
+
+% Plotting lap times
+plot(lapNumber(1:pitLap1), c5Fuel_Corrected_Stint,"Color","#D95319")
+hold on
+plot(lapNumber(pitLap1+1:pitLap2), c4Fuel_Corrected_Stint1,"Color","#EDB120")
+plot(lapNumber(pitLap2+1:50), c4Fuel_Corrected_Stint2,"Color","#EDB120")
+xline(pitLap1,":")
+xline(pitLap2,":")
+xlabel("Lap Number")
+ylabel("Fuel Corrected Lap Times (s)")
+title("C5, C4, C4 2 Stop Strategy")
+legend(["C5" "C4" "" "Pit Lap" ""],"Location","northeast")
+hold off
+
+% Sum fuel corrected stint times with the pit stop time to determine
+% overall race time.
+totalRaceTimeC5C4C4_sec = seconds(sum(c5Fuel_Corrected_Stint) + sum(c4Fuel_Corrected_Stint1) + sum(c4Fuel_Corrected_Stint2) + (2.*pitTime))  %seconds
+totalRaceTimeC5C4C4_min = minutes(minutes(totalRaceTimeC5C4C4_sec))  %minutes
