@@ -9,7 +9,7 @@
   - [Next Steps](#next-steps)
 - [Non-Linear Tyre Degradation Model](#non-linear-tyre-degradation-model-analysis)
   - [Soft-Medium](#non-linear-soft---medium-1-stop)
-  - [Soft-Soft_Medium](#non-linear-soft---soft---medium-2-stop)
+  - [Soft-Soft-Medium](#non-linear-soft---soft---medium-2-stop)
   - [Medium-Hard](#non-linear-medium---hard-1-stop)
   - [Soft-Hard](#non-linear-soft---hard-1-stop)
   - [Soft-Medium-Medium](#non-linear-soft---medium---medium-2-stop)
@@ -153,9 +153,10 @@ Average Speed = $229.8\ km/h$
 
 ![C5C4C4_2Stop_Non_Linear](./LasVegas_NonLinear_C5C4C4_2_Stop.png)
 
-Total Racetime = $4765.4\ seconds$ ($\approx79.4\ minutes$)
+Total Racetime = $4767.0\ seconds$ ($\approx79.4\ minutes$)
 
-Average Speed = $231.1\ km/h$
+Average Speed = $231.0\ km/h$
 
 ## Optimal Strategy
 
+In this non-linear degradation model, it is now clear that a two stop strategy is the fastest method of completing the race; with the Soft-Soft-Medium 1.6 seconds faster than the Soft-Medium-Medium strategy.
