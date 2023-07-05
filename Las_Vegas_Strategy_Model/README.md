@@ -2,11 +2,18 @@
 
 - [Introduction](#introduction)
 - [Linear Tyre Degradation Model](#linear-tyre-degradation-model-analysis)
-  - [Soft-Medium](#soft---medium-1-stop)
-  - [Soft-Soft-Medium](#soft---soft---medium-2-stop)
-  - [Medium-Hard](#medium---hard-1-stop)
+  - [Soft-Medium](#linear-soft---medium-1-stop)
+  - [Soft-Soft-Medium](#linear-soft---soft---medium-2-stop)
+  - [Medium-Hard](#linear-medium---hard-1-stop)
   - [Optimal Strategy](#optimal-strategy)
   - [Next Steps](#next-steps)
+- [Non-Linear Tyre Degradation Model](#non-linear-tyre-degradation-model-analysis)
+  - [Soft-Medium](#non-linear-soft---medium-1-stop)
+  - [Soft-Soft_Medium](#non-linear-soft---soft---medium-2-stop)
+  - [Medium-Hard](#non-linear-medium---hard-1-stop)
+  - [Soft-Hard](#non-linear-soft---hard-1-stop)
+  - [Soft-Medium-Medium](#non-linear-soft---medium---medium-2-stop)
+  - [Optimal Strategy](#optimal-strategy-1)
 
 ## Introduction
 
@@ -46,7 +53,7 @@ Fuel Efficiency and Total Fuel Load: $$110\ kg / 50\ laps = 2.2\ kg/lap$$
 
 Laptime Fuel-Correction: $$0.035s / 1kg\ \times 2.2kg/lap = 0.077 s/lap$$
 
-This linear tyre model clearly shows the tyre degradation trend for each compound assuming no maximum absolute life. Improvements to the tyre model in the form of more accurate data for compound degradation rate and absolute life would be possible using histroical data for the C3, C4, and C5 tyres, as well as Driver-in-the-loop simulation and free practice session telemetry. In all likelihood, the real tyre model would be non-linear, modelling the tyre "cliff", the point at which the tyre is critically worn and laptime increases significantly.
+This linear tyre model clearly shows the tyre degradation trend for each compound assuming no maximum absolute life. Improvements to the tyre model in the form of more accurate data for compound degradation rate and absolute life would be possible using historical data for the C3, C4, and C5 tyres, as well as Driver-in-the-loop simulation and free practice session telemetry. In all likelihood, the real tyre model would be non-linear, modelling the tyre "cliff", the point at which the tyre is critically worn and laptime increases significantly.
 
 Based on this simplified linear tyre model estimate, 3 common race strategies have been modelled and compared:
 
@@ -56,7 +63,7 @@ Based on this simplified linear tyre model estimate, 3 common race strategies ha
 
 Note: Each model does incorporate the pit stop time losses within the total race time, this is not shown in the fuel-corrected laptime plots but simply added to the total race time for the appropriate number of pit stops.
 
-### Soft - Medium (1 Stop)
+### Linear: Soft - Medium (1 Stop)
 
 ![C5C4_1Stop_Linear](./LasVegas_C5C4_1_Stop.png)
 
@@ -64,7 +71,7 @@ Total Racetime = $4770.1\ seconds$ ($\approx79.5\ minutes$)
 
 Average Speed = $230.8\ km/h$
 
-### Soft - Soft - Medium (2 Stop)
+### Linear: Soft - Soft - Medium (2 Stop)
 
 ![C5C5C4_2Stop_Linear](./LasVegas_C5C5C4_2_Stop.png)
 
@@ -72,7 +79,7 @@ Total Racetime = $4772.4\ seconds$ ($\approx79.5\ minutes$)
 
 Average Speed = $230.7\ km/h$
 
-### Medium - Hard (1 Stop)
+### Linear: Medium - Hard (1 Stop)
 
 ![C4C3_1Stop_Linear](./LasVegas_C4C3_1_Stop.png)
 
@@ -93,3 +100,62 @@ In conclusion, a race strategy prediction is only as good as the accuracy of tyr
 - Developing a non-linear tyre model more accurate to reality, representing the "cliff" or significant dropoff in performance at a given point.
 
 - Further in-depth analysis of appropriate SC and VSC windows to optimise the strategy even under specific circumstances.
+
+# Non-Linear Tyre Degradation Model Analysis
+
+Starting by defining an initial lap tyre pace delta of $0.7s$ for each compound, and non-linear tyre degradation factors in order to better represent the finite lifespan of each compound and the tyre "cliff" or "dropoff." This non-linear model was constructed by generating continually increasing tyre wear factors for each lap, with a steeper rate of increase for the softer of the tyres. While a slightly different tyre pace delta is assumed in this model compared to the linear trye degradation model, we still consider the overall wear on the circuit to be minimal due to track characteristics, temperature, and surface as described in the [introduction](#introduction). The resulting non-linear tyre degradation model is given:
+
+![Non-Linear tyre Pace Model](./LasVegas_Estimated_NonLinear_Tyre_Pace_Model.png)
+
+Once again we assume a $0.077s/lap$ improvement due to fuel burn reducing the overall mass of the car, and we consider the same 3 strategies as in the [linear model](#linear-tyre-degradation-model-analysis), in addition to 2 more:
+
+1. C5 Soft -> C4 Medium. (1 Stop)
+2. C5 Soft -> C5 Soft -> C4 Medium. (2 Stop)
+3. C4 Medium -> C3 Hard. (1 Stop)
+4. C5 Soft -> C3 Hard. (1 Stop)
+5. C5 Soft -> C4 Medium -> C4 Medium. (2 Stop)
+
+Note: Each model does incorporate the pit stop time losses within the total race time, this is not shown in the fuel-corrected laptime plots but simply added to the total race time for the appropriate number of pit stops.
+
+### Non-Linear: Soft - Medium (1 Stop)
+
+![C5C4_1Stop_Non_Linear](./LasVegas_NonLinear_C5C4_1_Stop.png)
+
+Total Racetime = $4785.0\ seconds$ ($\approx79.7\ minutes$)
+
+Average Speed = $230.1\ km/h$
+
+### Non-Linear: Soft - Soft - Medium (2 Stop)
+
+![C5C5C4_2Stop_Non_Linear](./LasVegas_NonLinear_C5C5C4_2_Stop.png)
+
+Total Racetime = $4765.4\ seconds$ ($\approx79.4\ minutes$)
+
+Average Speed = $231.1\ km/h$
+
+### Non-Linear: Medium - Hard (1 Stop)
+
+![C4C3_1Stop_Non_Linear](./LasVegas_NonLinear_C4C3_1_Stop.png)
+
+Total Racetime = $4786.5\ seconds$ ($\approx79.8\ minutes$)
+
+Average Speed = $230.1\ km/h$
+
+### Non-Linear: Soft - Hard (1 Stop)
+
+![C5C3_1Stop_Non_Linear](./LasVegas_NonLinear_C5C3_1_Stop.png)
+
+Total Racetime = $4792.3\ seconds$ ($\approx79.9\ minutes$)
+
+Average Speed = $229.8\ km/h$
+
+### Non-Linear: Soft - Medium - Medium (2 Stop)
+
+![C5C4C4_2Stop_Non_Linear](./LasVegas_NonLinear_C5C4C4_2_Stop.png)
+
+Total Racetime = $4765.4\ seconds$ ($\approx79.4\ minutes$)
+
+Average Speed = $231.1\ km/h$
+
+## Optimal Strategy
+
