@@ -3,7 +3,7 @@
 % Tyres available: C3, C4, C5 - The 3 softest in the Pirelli range.
 % Race Duration: 50 laps (305.88km total distance)
 
-% Assumption of initial tyre pace delta: 0.5s between C5 and C4, and 0.5s
+% Assumption of initial tyre pace delta: 0.7s between C5 and C4, and 0.7s
 % between C4 and C3. With C5 being the fastest.
 
 % Assumption of degradation per lap: Fuel corrected laptime increase
@@ -29,16 +29,16 @@ fuelLapCorrections = fuelCorrectionFactor .* (lapNumber-1);
 %% 
 % Defining Tyre Wear Factors
 
-c5Wear = linspace(0.09,0.5,50);
-c4Wear = linspace(0.08,0.17,50);
-c3Wear = linspace(0.077,0.1,50);
+c5Wear = linspace(0.09,0.5,50);  %seconds
+c4Wear = linspace(0.08,0.17,50); %seconds
+c3Wear = linspace(0.077,0.1,50); %seconds
 
 tyreAge = 1:50; %laps
 %% 
 % Calculating Tyre Degradation Laptime Impact
 
-c5InitialLaptime = 95;   %seconds
-c4InitialLaptime = 95.7; %seconds
+c5InitialLaptime = 95;     %seconds
+c4InitialLaptime = 95.7;   %seconds
 c3InitialLaptime = 96.4;   %seconds
 
 c5TyreDegLaptime = c5InitialLaptime + c5Wear .* (tyreAge-1);
@@ -92,6 +92,7 @@ plot(lapNumber(pitLap+1:50), c4Fuel_Corrected_Stint,"Color","#EDB120")
 xline(pitLap,":")
 xlabel("Lap Number")
 ylabel("Fuel Corrected Lap Times (s)")
+ylim([93 98.5])
 title("C5 to C4 1 Stop Strategy")
 legend(["C5" "C4" "Pit Lap"],"Location","northeast")
 hold off
@@ -117,6 +118,7 @@ plot(lapNumber(pitLap+1:50), c3Fuel_Corrected_Stint,"Color","#000000")
 xline(pitLap,":")
 xlabel("Lap Number")
 ylabel("Fuel Corrected Lap Times (s)")
+ylim([93 98.5])
 title("C5 to C3 1 Stop Strategy")
 legend(["C5" "C3" "Pit Lap"],"Location","northeast")
 hold off
@@ -142,6 +144,7 @@ plot(lapNumber(pitLap+1:50), c3Fuel_Corrected_Stint,"Color","#000000")
 xline(pitLap,":")
 xlabel("Lap Number")
 ylabel("Fuel Corrected Lap Times (s)")
+ylim([93 98.5])
 title("C4 to C3 1 Stop Strategy")
 legend(["C4" "C3" "Pit Lap"],"Location","northeast")
 hold off
@@ -171,6 +174,7 @@ xline(pitLap1,":")
 xline(pitLap2,":")
 xlabel("Lap Number")
 ylabel("Fuel Corrected Lap Times (s)")
+ylim([93 98.5])
 title("C5, C5, C4 2 Stop Strategy")
 legend(["C5" "" "C4" "Pit Lap" ""],"Location","northeast")
 hold off
@@ -200,6 +204,7 @@ xline(pitLap1,":")
 xline(pitLap2,":")
 xlabel("Lap Number")
 ylabel("Fuel Corrected Lap Times (s)")
+ylim([93 98.5])
 title("C5, C4, C4 2 Stop Strategy")
 legend(["C5" "C4" "" "Pit Lap" ""],"Location","northeast")
 hold off
