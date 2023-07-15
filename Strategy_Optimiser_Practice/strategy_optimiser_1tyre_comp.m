@@ -1,52 +1,82 @@
-% Consider a 50 lap race, with a single tyre compound choice and 
-% constraining the pit allowance to a single stop.
-% During a pit sotp the tyres are changed to a fresh set of the same
-% compound.
+%% Race Strategy Pit Lap Optimisation.
+% Consider a 50 lap race with a single compound of tyre available and a mandatory 
+% pit stop, what is the optimum lap to pit for fresh tyres for a given tyre wear 
+% and fuel correction model?
+% 
+% Assumption of degradation per lap: Fuel corrected laptime increases non-linearly 
+% as tyre wears (non-linear tyre deg model estimate).
+% 
+% Fuel correction assumption for 110kg of fuel to last 50 laps and 0.035s laptime 
+% gain per 1kg of fuel burn.
+% 
 % Let's assume a pit stop takes 20 seconds to complete.
+%% 
+% Calculating Fuel Correction Factor
 
-% We want to use an optimisation problem to determine the optimum pit lap
-% in this 50 lap race by minimising the total race-time, assuming
-% a linear decline in pace each lap as the tyres wear.
+fuelQuantity = 110;  %kg
+totalLapNumber = 50; %laps
+lapNumber = 1:50;
+timePerKg = 0.035;   %seconds
 
-% For this, we will define the lap-time (pace) of the tyre for each lap,
-% let's assume a starting pace of 90s and a consistent 0.5s decline in pace each lap on the tyre.
+fuelConsumption = fuelQuantity/totalLapNumber;   %kg/lap
 
-% We need to define the following:
+fuelCorrectionFactor = fuelConsumption .* timePerKg; %seconds/lap
 
-% lapNumber: (1 - 50)
-% tyreAge: (1 - 50)
-% lapTime: (n, n+0.5, n+1, ..., n+(49*0.5))
-% pitTime: 20s (After which, the tyreAge is 1 and grows linearly again.)
+fuelLapCorrections = fuelCorrectionFactor .* (lapNumber-1);
+%% 
+% Defining Tyre Wear Factor
+
+tyreWear = linspace(0.08,0.17,50); %seconds
+
+tyreAge = 1:50; %laps
+%% 
+% Calculating Tyre Degradation Laptime Impact
+
+initialLaptime = 95;   %seconds
+
+tyreDegLaptime = initialLaptime + tyreWear .* (tyreAge-1);
+%% 
+% Calculating Tyre and Fuel Effected Laptimes for Full Distance Tyre Model
+
+laptime = initialLaptime + (tyreWear .* (tyreAge-1)) - fuelLapCorrections(lapNumber);
+%%
+% To determine fuel corrected laptimes for individual stints, the following 
+% formula is appropriate:
+
+% Fuel_Corrected_Stint_Formula = TyreDegLaptime(tyreAge(1:end_of_stint)) 
+% - fuelLapCorrections(lapNumber(stint_start_lap:stint_end_lap))
+%% 
+% Defining Average Pit Time Loss
+
+pitTime = 20;  %seconds
+%% 
+% Plotting the tyre model to visualise the tyre life and pace over the full 
+% race distance.
+
+plot(lapNumber,laptime,"Color","#EDB120")
+xlabel("Lap Number")
+ylabel("Fuel Corrected Laptime (s)")
+ylim([94.5 100])
+title("Estimated Tyre Pace Model (Non-Linear)")
+%% 
+% Defining the optimisation problem with objective function, variables and constraints.
 
 % Objective (minimise over 50 laps) raceTime = total lap times (including pit time).
 
 % Establish the logic such that we can choose to stop at any point, and 
 % only once, at which point the tyreAge returns to 1. (Expect therefore the
-% optimal stop to be at the half way point of the race.
+% optimal stop to be at the half way point of the race).
 
-pitTime = 20;
-tyreAge = 1:50;
-%lapTime = 90 + 0.5.*(tyreAge-1);
+prob = optimproblem("Description","Single_Tyre_Pit_Lap","ObjectiveSense","minimize");
+pitLap = optimvar("pitLap",'Type','integer','LowerBound',1,'UpperBound',49);
 
-prob = optimproblem("Description","Single_Linear_Tyre_Pit_Lap","ObjectiveSense","minimize");
+% Calculating fuel corrected stints
+%fuel_Corrected_Stint1 = laptime(tyreAge(1:pitLap));
+%fuel_Corrected_Stint2 = tyreDegLaptime(tyreAge(1:(50-pitLap))) - fuelLapCorrections(lapNumber(pitLap+1:50));
 
-% We need the solver to look at graphical plots for total race time when
-% pitting on Laps 1-49 and decide which option is fastest.
+%raceTimeTotal = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2) + pitTime  %seconds
 
-% We can plot individual lap times against lap number and aim to minimise the integral of the function which is the total race time.
-% lapTime = 90 + 0.5(tyreAge - 1).
-
-% raceTime is the sum of the integrals of lapTime with respect to tyreAge for each stint + pitTime:
-
-% raceTime = pitTime + integral[lapTime d(tyreAge)]pitLap;1 + integral[lapTime d(tyreAge)]50-pitLap;1
-
-% Our parameter to adjust is the pitLap, with the objective of minimising raceTime. 
-% (Expect pitLap = 25)
-
-pitLap = optimvar("pitLap");
-
-raceTimeTotal = pitTime + int(calculateLapTime(tyreAge),tyreAge,1,pitLap) + int(calculateLapTime(tyreAge),tyreAge,1,50-pitLap);
-%raceTimeTotal = pitTime + integral(calculateLapTime(tyreAge),1,pitLap) + integral(calculateLapTime(tyreAge),1,50-pitLap);
+raceTimeTotal = pitTime + int(calculateLapTime(initialLaptime,tyreWear,tyreAge,fuelLapCorrections,lapNumber),tyreAge,[1 pitLap]) + int(calculateLapTime(initialLaptime,tyreWear,tyreAge,fuelLapCorrections,lapNumber),tyreAge,[1 50-pitLap]);
 
 prob.Objective = raceTimeTotal;
 
