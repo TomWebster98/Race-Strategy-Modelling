@@ -1,3 +1,3 @@
-function lapTime = calculateLapTime(tyreAge)
-    lapTime = 90 + 0.5.*(tyreAge-1);
+function lapTime = calculateLapTime(initialLaptime, tyreWear, tyreAge, fuelLapCorrections, lapNumber)
+    lapTime = initialLaptime + (tyreWear .* (tyreAge-1)) - fuelLapCorrections(lapNumber);
 end
