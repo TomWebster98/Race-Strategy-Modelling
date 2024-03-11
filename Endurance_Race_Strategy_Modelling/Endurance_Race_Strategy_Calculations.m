@@ -73,8 +73,6 @@ grid on
 
 lapTime = zeros(1,totalLapNumber);
 
-% lapTime = initialLaptime + (tyreWearFactor .* (tyreAge-1)) - (fuelTankVolume - fuelRemaining_l) .* timePerKg;
-
 fuelRemaining_l = zeros(1,totalLapNumber);
 numberOfPitstops = 0;
 
@@ -92,20 +90,38 @@ for i = 1:totalLapNumber
     end
 end
 
+%% Sum Laptimes to Find Actual Laps Completed in Race Duration
+
+cumulativeRaceTime = cumsum(lapTime);
+lapsComplete = 0;
+
+for i = 1:length(cumulativeRaceTime)
+    if lapsComplete == 0
+        if cumulativeRaceTime(i) > raceDuration_sec
+            lapsComplete = i;
+        end
+    end
+end
+
 %% Plot Fuel Level
 
 figure(2)
-plot(lapNumber, fuelRemaining_l)
+plot(lapNumber, fuelRemaining_l,"LineWidth",1)
+hold on
+xline(lapsComplete,"LineWidth",1)
 xlabel('Lap Number')
 ylabel('Fuel Remaining in Tank (Litres)')
 xlim([1,totalLapNumber])
 title('Full Race Distance Fuel Quantity')
 grid on
+hold off
 
 %% Plot Laptimes
 
 figure(3)
-plot(lapNumber, lapTime)
+plot(lapNumber, lapTime,"LineWidth",1)
+hold on
+xline(lapsComplete,"LineWidth",1)
 xlabel('Lap Number')
 ylabel('Laptimes (s)')
 xlim([1,totalLapNumber])
@@ -113,3 +129,20 @@ xticks(0:5:105)
 yticks(105:2.5:120)
 title('Full Race Laptimes')
 grid on
+hold off
+
+%% Gapper Plot with Calcs to Reference Average Laptime
+
+lapTimesCompleted = lapTime(1:lapsComplete);
+isoAvgLapTime = cumulativeRaceTime(lapsComplete)/lapsComplete;
+
+isoPace = cumsum(ones(1, length(lapTimesCompleted)) .* isoAvgLapTime);
+isoPaceDelta = cumulativeRaceTime(1:lapsComplete) - isoPace;
+
+figure(4)
+plot(1:lapsComplete,isoPaceDelta,"LineWidth",1)
+title('Endurance Race Laptime Delta to Reference Average Laptime')
+xlabel('Lap Number')
+ylabel('Delta to Average (s)')
+grid on
+xlim([1,lapsComplete])
