@@ -7,7 +7,7 @@ lapNumber = 1:totalLapNumber;
 
 fuelTankVolume = 30; % L fuel tank size
 fuelDensity = 0.75; % kg/l
-fuelTankMass_kg = fuelTankVolume / fuelDensity;  % kg
+fuelTankMass_kg = fuelTankVolume .* fuelDensity;  % kg
 engineConsumption = 29; % kg/h
 
 raceDuration = 3; % hours
@@ -72,6 +72,9 @@ grid on
 % If pitstop (refuelling+tyres), then laptime for that lap is + tyre change time and pitlane time.
 
 lapTime = zeros(1,totalLapNumber);
+
+% lapTime = initialLaptime + (tyreWearFactor .* (tyreAge-1)) - (fuelTankVolume - fuelRemaining_l) .* timePerKg;
+
 fuelRemaining_l = zeros(1,totalLapNumber);
 numberOfPitstops = 0;
 
@@ -81,6 +84,7 @@ for i = 1:totalLapNumber
     elseif i~=1 && fuelRemaining_l(i-1) >= fuelBurnPerLap_l
         fuelRemaining_l(i) = fuelRemaining_l(i-1) - fuelBurnPerLap_l;
     end
+    lapTime(i) = initialLaptime + (tyreWearFactor(i) .* (tyreAge(i)-1)) - ((fuelTankVolume - fuelRemaining_l(i)) .* fuelDensity .* timePerKg);
     if fuelRemaining_l(i) < fuelBurnPerLap_l
         numberOfPitstops = numberOfPitstops + 1;
         fuelRemaining_l(i+1) = fuelTankVolume - fuelBurnPerLap_l;
@@ -88,3 +92,24 @@ for i = 1:totalLapNumber
     end
 end
 
+%% Plot Fuel Level
+
+figure(2)
+plot(lapNumber, fuelRemaining_l)
+xlabel('Lap Number')
+ylabel('Fuel Remaining in Tank (Litres)')
+xlim([1,totalLapNumber])
+title('Full Race Distance Fuel Quantity')
+grid on
+
+%% Plot Laptimes
+
+figure(3)
+plot(lapNumber, lapTime)
+xlabel('Lap Number')
+ylabel('Laptimes (s)')
+xlim([1,totalLapNumber])
+xticks(0:5:105)
+yticks(105:2.5:120)
+title('Full Race Laptimes')
+grid on
