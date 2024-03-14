@@ -82,7 +82,7 @@ for i = 1:totalLapNumber
     elseif i~=1 && fuelRemaining_l(i-1) >= fuelBurnPerLap_l
         fuelRemaining_l(i) = fuelRemaining_l(i-1) - fuelBurnPerLap_l;
     end
-    lapTime(i) = initialLaptime + (tyreWearFactor(i) .* (tyreAge(i)-1)) - ((fuelTankVolume - fuelRemaining_l(i)) .* fuelDensity .* timePerKg);
+    lapTime(i) = lapTime(i) + initialLaptime + (tyreWearFactor(i) .* (tyreAge(i)-1)) - ((fuelTankVolume - fuelRemaining_l(i)) .* fuelDensity .* timePerKg);
     if fuelRemaining_l(i) < fuelBurnPerLap_l
         numberOfPitstops = numberOfPitstops + 1;
         fuelRemaining_l(i+1) = fuelTankVolume - fuelBurnPerLap_l;
@@ -126,7 +126,7 @@ xlabel('Lap Number')
 ylabel('Laptimes (s)')
 xlim([1,totalLapNumber])
 xticks(0:5:105)
-yticks(105:2.5:120)
+%yticks(105:2.5:120)
 title('Full Race Laptimes')
 grid on
 hold off
