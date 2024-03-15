@@ -79,25 +79,23 @@ fuelRemaining_l = zeros(1,totalLapNumber);
 numberOfPitstops = 0;
 finalRefuel = 0;
 
-%raceTimeRemaining = zeros(1,totalLapNumber);
-
 for i = 1:totalLapNumber
     if i == 1
         fuelRemaining_l(i) = fuelTankVolume - fuelBurnPerLap_l;
     elseif i~=1 && fuelRemaining_l(i-1) >= fuelBurnPerLap_l
         fuelRemaining_l(i) = fuelRemaining_l(i-1) - fuelBurnPerLap_l;
     end
-    lapTime(i) = initialLaptime + (tyreWearFactor(i) .* (tyreAge(i)-1)) - ((fuelTankVolume - fuelRemaining_l(i)) .* fuelDensity .* timePerKg);
+    lapTime(i) = lapTime (i) + initialLaptime + (tyreWearFactor(i) .* (tyreAge(i)-1)) - ((fuelTankVolume - fuelRemaining_l(i)) .* fuelDensity .* timePerKg);
     raceTimeRemaining = raceDuration_sec - cumsum(lapTime);
     if fuelRemaining_l(i) < fuelBurnPerLap_l
-        numberOfPitstops = numberOfPitstops + 1;
         if (raceTimeRemaining(i) >= fullTankBurnTime_sec) & (i ~= totalLapNumber)
-            %numberOfPitstops = numberOfPitstops + 1;
+            numberOfPitstops = numberOfPitstops + 1;
             fuelRemaining_l(i+1) = fuelTankVolume - fuelBurnPerLap_l;
             lapTime(i+1) = pitLaneTime + (fuelTankVolume-fuelRemaining_l(i))/refuelRate;
         elseif (raceTimeRemaining(i) < fullTankBurnTime_sec) & (finalRefuel ~= 1)
             % Only fill to required amount to finish the race
             finalRefuel = 1;
+            numberOfPitstops = numberOfPitstops + 1;
             finalStintFuelVolume = ((engineConsumption/fuelDensity)/(60*60)) .* raceTimeRemaining(i-3);
             fuelRemaining_l(i+1) = finalStintFuelVolume - fuelBurnPerLap_l;
             lapTime(i+1) = pitLaneTime + (finalStintFuelVolume-fuelRemaining_l(i))/refuelRate;
