@@ -42,6 +42,11 @@ tyreWearFactor = tyreWearPerMile .* trackLength;  %seconds/lap
 
 tyreAge = 1:totalLapNumber; %laps
 
+%% Tyre Limit
+
+tyreAgeLimit_miles = 85; % miles
+tyreAgeLimit_laps = tyreAgeLimit_miles / trackLength;
+
 %% Laptime Forecast
 
 tyreDegModelLaptime = initialLaptime + (tyreWearFactor .* (tyreAge-1)) - fuelLapCorrections(lapNumber);
@@ -95,6 +100,12 @@ for i = 1:totalLapNumber
             numberOfPitstops = numberOfPitstops + 1;
             fuelRemaining_l(i+1) = fuelTankVolume - fuelBurnPerLap_l;
             lapTime(i+1) = pitLaneTime + (fuelTankVolume-fuelRemaining_l(i))/refuelRate;
+            if tyreAgeLimit_laps - tyreAge(i) < (fuelTankVolume/fuelBurnPerLap_l)
+                % Change tyres as they will die before next refuel stop
+                lapTime(i+1) = lapTime(i+1) + tyreChangeTime - (fuelTankVolume-fuelRemaining_l(i))/refuelRate;
+                tyreChangeLap = i;
+                tyreAge(tyreChangeLap:totalLapNumber) = lapNumber(1:(totalLapNumber-tyreChangeLap+1)); % Update tyreAge vector to reflect fresh tyres from this point
+            end
         elseif (raceTimeRemaining(i) < fullTankBurnTime_sec) & (finalRefuel ~= 1)
             % Only fill to required amount to finish the race
             finalRefuel = 1;
