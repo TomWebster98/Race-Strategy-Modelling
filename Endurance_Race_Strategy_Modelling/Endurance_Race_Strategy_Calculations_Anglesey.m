@@ -1,5 +1,7 @@
 %% Race Strategy Modelling for Mini-Endurance Races (2-3 Hours)
 
+% Anglesey coastal circuit length = 1.550 Miles
+
 totalLapNumber = 80; % laps estimated for Anglesey Endurance round (2hours)
 lapNumber = 1:totalLapNumber;
 
@@ -34,7 +36,9 @@ fullTankBurnTime_sec = (fuelTankVolume / (engineConsumption/fuelDensity))*(60*60
 
 %% Tyre Wear Forecast
 
-tyreWearFactor = linspace(0.09,0.14,totalLapNumber);  %seconds
+trackLength = 1.550; % Miles
+tyreWearPerMile = 0.0217; % s/mile
+tyreWearFactor = tyreWearPerMile .* trackLength;  %seconds/lap
 
 tyreAge = 1:totalLapNumber; %laps
 
@@ -68,8 +72,7 @@ grid on
 
 % fuelRemaining_l = fuelTankVolume - (fuelBurnPerLap_kg / fuelDensity) .* lapNumber;
 
-% If fuel remaining in tank < fuel required to complete a lap: pitstop
-% (refuelling)
+% If fuel remaining in tank < fuel required to complete a lap: pitstop (refuelling)
 % If pitstop (refuelling only), then laptime for that lap is + refuel time and pitlane time.
 % If pitstop (refuelling+tyres), then laptime for that lap is + tyre change time and pitlane time.
 
@@ -85,10 +88,10 @@ for i = 1:totalLapNumber
     elseif i~=1 && fuelRemaining_l(i-1) >= fuelBurnPerLap_l
         fuelRemaining_l(i) = fuelRemaining_l(i-1) - fuelBurnPerLap_l;
     end
-    lapTime(i) = lapTime (i) + initialLaptime + (tyreWearFactor(i) .* (tyreAge(i)-1)) - ((fuelTankVolume - fuelRemaining_l(i)) .* fuelDensity .* timePerKg);
+    lapTime(i) = lapTime(i) + initialLaptime + (tyreWearFactor .* (tyreAge(i)-1)) - ((fuelTankVolume - fuelRemaining_l(i)) .* fuelDensity .* timePerKg);
     raceTimeRemaining = raceDuration_sec - cumsum(lapTime);
     if fuelRemaining_l(i) < fuelBurnPerLap_l
-        if (raceTimeRemaining(i) >= fullTankBurnTime_sec) & (i ~= totalLapNumber)
+        if (raceTimeRemaining(i) >= fullTankBurnTime_sec) && (i ~= totalLapNumber)
             numberOfPitstops = numberOfPitstops + 1;
             fuelRemaining_l(i+1) = fuelTankVolume - fuelBurnPerLap_l;
             lapTime(i+1) = pitLaneTime + (fuelTankVolume-fuelRemaining_l(i))/refuelRate;
