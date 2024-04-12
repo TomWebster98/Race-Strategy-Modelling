@@ -22,7 +22,7 @@ refuelsRequired = totalFuelRequired_l / fuelTankVolume;
 
 initialLaptime = 105.8;   %seconds
 
-timePerKg = 0.035;   % seconds of laptime gain per kg fuel used
+timePerKg = 0.006;   % seconds of laptime gain per kg fuel used
 fuelBurnPerLap_kg = (engineConsumption/(60*60)) .* initialLaptime; % kg/lap Fuel burn per lap approximation
 fuelBurnPerLap_l = fuelBurnPerLap_kg / fuelDensity; % litres
 

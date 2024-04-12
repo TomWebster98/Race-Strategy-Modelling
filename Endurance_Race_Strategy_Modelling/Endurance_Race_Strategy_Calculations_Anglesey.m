@@ -2,7 +2,7 @@
 
 % Anglesey coastal circuit length = 1.550 Miles
 
-totalLapNumber = 80; % laps estimated for Anglesey Endurance round (2hours)
+totalLapNumber = 110; % laps estimated for Anglesey Endurance round (2hours)
 lapNumber = 1:totalLapNumber;
 
 %% Refuelling Stops Required
@@ -22,9 +22,9 @@ estimatedRefuelsRequired = totalFuelRequired_l / fuelTankVolume;
 
 %% Fuel-Burn Laptime Correction
 
-initialLaptime = 90;   %seconds
+initialLaptime = 65.913;   %seconds
 
-timePerKg = 0.035;   % seconds of laptime gain per kg fuel used
+timePerKg = 0.007;   % seconds of laptime gain per kg fuel used
 fuelBurnPerLap_kg = (engineConsumption/(60*60)) .* initialLaptime; % kg/lap Fuel burn per lap approximation
 fuelBurnPerLap_l = fuelBurnPerLap_kg / fuelDensity; % litres
 
