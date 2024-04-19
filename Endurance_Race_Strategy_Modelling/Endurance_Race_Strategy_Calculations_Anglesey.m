@@ -16,7 +16,7 @@ raceDuration_sec = raceDuration*60*60; % seconds
 
 %% Energy Use and PWT Parameters
 
-EnergyUsePerLap = 2.4;  % kWh
+EnergyUsePerLap = 2.12232464;  % kWh
 
 BatteryCapacity = 8.9;    % kWh
 ICECapacity = 110.55;     % kWh
@@ -122,7 +122,7 @@ for i = 1:totalLapNumber
         stint_number = stint_number + 1;
         ICE_SOC_kWh(i+1) = Energy_Per_Stint - EnergyUsePerLap;
         lapTime(i+1) = pitLaneTime + (refuelAmount_kg/refuelRate_kg);
-    elseif i == (2*Stint_Length)
+    elseif i == (2*Stint_Length)-1
         numberOfPitstops = numberOfPitstops + 1;
         stint_number = stint_number + 1;
         numberOFTyreChanges = numberOFTyreChanges + 1;
@@ -130,12 +130,12 @@ for i = 1:totalLapNumber
         tyreAge(tyreChangeLap:totalLapNumber) = lapNumber(1:(totalLapNumber-tyreChangeLap+1)); % Update tyreAge vector to reflect fresh tyres from this point
         ICE_SOC_kWh(i+1) = Energy_Per_Stint - EnergyUsePerLap;
         lapTime(i+1) = pitLaneTime + tyreChangeTime - (refuelAmount_kg/refuelRate_kg);
-    elseif i == (3*Stint_Length)
+    elseif i == (3*Stint_Length)-2
         numberOfPitstops = numberOfPitstops + 1;
         stint_number = stint_number + 1;
-        if raceTimeRemaining(i) < ICE_runtime*(refuelAmount_kg/fuelTankMass_kg)
-            ICE_SOC_kWh(i+1) = Energy_Per_Stint - EnergyUsePerLap;
-            lapTime(i+1) = pitLaneTime + (refuelAmount_kg/refuelRate_kg);
+        if raceTimeRemaining(i) < ICE_runtime*((0.9*fuelTankMass_kg)/fuelTankMass_kg)
+            ICE_SOC_kWh(i+1) = 0.9*ICE_UsableEnergy - EnergyUsePerLap;
+            lapTime(i+1) = pitLaneTime + (0.9*fuelTankMass_kg/refuelRate_kg);
         else
             ICE_SOC_kWh(i+1) = ICE_UsableEnergy - EnergyUsePerLap;
             lapTime(i+1) = pitLaneTime + (fuelTankMass_kg/refuelRate_kg);           
