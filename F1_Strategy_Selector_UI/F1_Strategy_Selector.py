@@ -63,11 +63,12 @@ class TyreModel:
         Returns the hard compound degradation in s/lap.
 
     """
-    def __init__(self,soft_laptime, medium_laptime, hard_laptime,  starting_compound ,soft_deg = 0.155, medium_deg = 0.115, hard_deg = 0.1):
-        self.soft_initial_laptime = soft_laptime
-        self.medium_initial_laptime = medium_laptime
-        self.hard_initial_laptime = hard_laptime
-        self.starting_compound = starting_compound
+    def __init__(self,soft_deg = 0.155, medium_deg = 0.115, hard_deg = 0.1):
+        self.soft_initial_laptime = None
+        self.medium_initial_laptime = None
+        self.hard_initial_laptime = None
+        self.starting_compound = None
+        self.total_lap_number = None
         self.soft_compound_degradation = soft_deg
         self.medium_compound_degradation = medium_deg
         self.hard_compound_degradation = hard_deg
@@ -84,6 +85,9 @@ class TyreModel:
     def set_starting_compound(self, first_compound):
         self.starting_compound = first_compound
 
+    def set_total_lap_number(self, total_lap_number):
+        self.total_lap_number = total_lap_number
+
     def get_soft_initial_laptime(self):
         return self.soft_initial_laptime      
 
@@ -95,6 +99,9 @@ class TyreModel:
 
     def get_starting_compound(self):
         return self.starting_compound
+    
+    def get_total_lap_number(self):
+        return self.total_lap_number
 
     def get_soft_compound_degradation(self):
         return self.soft_compound_degradation   
@@ -129,10 +136,7 @@ class CommandLine:
     Methods
     -------
     menu(self):
-        Prints the list of tyres from the TYRES dictionary as well as the current starting tyre.
-
-    define_tyre_information(self, tm):
-        Handles tyre information input from user and sets the tyre compound attributes accordingly.        
+        Prints the list of tyres from the TYRES dictionary as well as the current starting tyre.     
 
     choose_starting_tyre(self, tm):
         Handles starting tyre input from user sets the starting tyre accordingly.
@@ -149,7 +153,7 @@ class CommandLine:
         Prints the list of tyres from the TYRES dictionary as well as the current starting tyre.
         """
         print()
-        print("Enter Starting Tyre Name")
+        print("Enter Starting Tyre Number")
         print("-------------------------------")
         for x in TYRES:
             print(f"{x} : {TYRES.get(x)}")
@@ -157,22 +161,35 @@ class CommandLine:
         print()
         print(
             f"Current Starting Tyre: {tm.get_starting_compound()}, {TYRES.get(tm.get_starting_compound())}")
+        print(f"Calculating Optimal Strategy for a {tm.get_total_lap_number()} Lap Race")
         print("-------------------------------")
 
-    def choose_starting_tyre(self, starting_tyre_number_str):
+    def define_tyre_info(self, starting_tyre_number_str, total_lap_number_str, soft_initial_laptime_str, medium_initial_laptime_str, hard_initial_laptime_str):
         """
-        Handles starting tyre input from user sets the starting tyre accordingly.
+        Handles tyre information input and total lap number from user and sets the attributed in TyreModel accordingly.
         """
         try:
             starting_tyre = int(starting_tyre_number_str)
+            total_lap_number = int(total_lap_number_str)
+            soft_initial_laptime = float(soft_initial_laptime_str)
+            medium_initial_laptime = float(medium_initial_laptime_str)
+            hard_initial_laptime = float(hard_initial_laptime_str)
             if starting_tyre not in TYRES.keys():
+                raise ValueError
+            if total_lap_number < 40 or total_lap_number > 70:
                 raise ValueError
         except ValueError:
             print()
             print(
-                "Error: invalid tyre compound selected. Please enter a valid tyre compound from the list provided.")
+                "Error: invalid tyre compound, total lap number or initial laptime value selected.")
         else:
             self.tm.set_starting_compound(starting_tyre)
+            self.tm.set_total_lap_number(total_lap_number)
+            self.tm.set_soft_initial_laptime(soft_initial_laptime)
+            self.tm.set_medium_initial_laptime(medium_initial_laptime)
+            self.tm.set_hard_initial_laptime(hard_initial_laptime)
+            self.strategy_calculations()
+
 
     def userinput(self):
         """
@@ -189,9 +206,30 @@ class CommandLine:
                 print()
                 running = False
             else:
-                self.choose_starting_tyre(starting_tyre_str)   
+                total_lap_number_str = input("Total Number of Racing Laps (40-70): ")
+                total_lap_number_str = total_lap_number_str.strip()
+                soft_initial_laptime_str = input("Soft Tyre Initial Laptime (s): ")
+                soft_initial_laptime_str = soft_initial_laptime_str.strip()
+                medium_initial_laptime_str = input("Medium Tyre Initial Laptime (s): ")
+                medium_initial_laptime_str = medium_initial_laptime_str.strip()
+                hard_initial_laptime_str = input("Hard Tyre Initial Laptime (s): ")
+                hard_initial_laptime_str = hard_initial_laptime_str.strip()              
+                self.define_tyre_info(starting_tyre_str, total_lap_number_str, soft_initial_laptime_str, medium_initial_laptime_str, hard_initial_laptime_str)   
+
+    def strategy_calculations(self):
+        """
+        Calculates optimal strategy for defined starting tyre compound, initial laptimes and degradation.
+        """
+        # for tyreAge in range(0,self.tm.get_total_lap_number(),1):
+        #     soft_laptimes = self.tm.get_soft_initial_laptime + ()
+        
+        
+        # if self.tm.get_starting_compound == 1:
+        #     for pitLap in range(1,self.tm.get_total_lap_number(),1):
+        #         stint1_times = 
+
 
 if __name__ == '__main__':
-    tm = TyreModel(soft_laptime=None, medium_laptime=None, hard_laptime=None, starting_compound=None)
+    tm = TyreModel()
     cmd = CommandLine(tm)
     cmd.userinput()
