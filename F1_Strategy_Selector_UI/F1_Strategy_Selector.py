@@ -69,6 +69,8 @@ class TyreModel:
         self.hard_initial_laptime = None
         self.starting_compound = None
         self.total_lap_number = None
+        self.optimal_strategy = None
+        self.optimal_pitlap = None
         self.soft_compound_degradation = soft_deg
         self.medium_compound_degradation = medium_deg
         self.hard_compound_degradation = hard_deg
@@ -88,6 +90,12 @@ class TyreModel:
     def set_total_lap_number(self, total_lap_number):
         self.total_lap_number = total_lap_number
 
+    def set_optimal_strategy(self, optimal_strategy):
+        self.optimal_strategy = optimal_strategy
+
+    def set_optimal_pitlap(self, optimal_pitlap):
+        self.optimal_pitlap = optimal_pitlap
+
     def get_soft_initial_laptime(self):
         return self.soft_initial_laptime      
 
@@ -102,6 +110,12 @@ class TyreModel:
     
     def get_total_lap_number(self):
         return self.total_lap_number
+    
+    def get_optimal_strategy(self):
+        return self.optimal_strategy
+    
+    def get_optimal_pitlap(self):
+        return self.optimal_pitlap
 
     def get_soft_compound_degradation(self):
         return self.soft_compound_degradation   
@@ -162,6 +176,8 @@ class CommandLine:
         print(
             f"Current Starting Tyre: {tm.get_starting_compound()}, {TYRES.get(tm.get_starting_compound())}")
         print(f"Calculating Optimal Strategy for a {tm.get_total_lap_number()} Lap Race")
+        print(f"Optimal Strategy: {tm.get_optimal_strategy()}")
+        print(f"Optimal Pit Lap: {tm.get_optimal_pitlap()}")
         print("-------------------------------")
 
     def define_tyre_info(self, starting_tyre_number_str, total_lap_number_str, soft_initial_laptime_str, medium_initial_laptime_str, hard_initial_laptime_str):
@@ -189,8 +205,7 @@ class CommandLine:
             self.tm.set_medium_initial_laptime(medium_initial_laptime)
             self.tm.set_hard_initial_laptime(hard_initial_laptime)
             self.strategy_calculations()
-
-
+                        
     def userinput(self):
         """
         Handles looping for repeated user inputs to change through starting tyre strategies.
@@ -232,15 +247,21 @@ class CommandLine:
             soft_medium_racetimes = []
             soft_hard_racetimes = []
             for pitLap in range(1, self.tm.get_total_lap_number(), 1):
-                stint1_times = soft_laptimes[tyreAge[0:pitLap+1]]
-                stint2_times_Med = medium_laptimes[tyreAge[0:(self.tm.get_total_lap_number()-pitLap)]]
-                stint2_times_Hard = hard_laptimes[tyreAge[0:(self.tm.get_total_lap_number()-pitLap)]]
-                soft_medium_racetimes.append(sum(stint1_times + sum(stint2_times_Med)))
-                soft_hard_racetimes.append(sum(stint1_times + sum(stint2_times_Hard)))
+                stint1_times = soft_laptimes[0:pitLap+1]
+                stint2_times_Med = medium_laptimes[0:(self.tm.get_total_lap_number()-pitLap)]
+                stint2_times_Hard = hard_laptimes[0:(self.tm.get_total_lap_number()-pitLap)]
+                soft_medium_racetimes.append(sum(stint1_times) + sum(stint2_times_Med))
+                soft_hard_racetimes.append(sum(stint1_times) + sum(stint2_times_Hard))
             optimal_softmed_time = min(soft_medium_racetimes)
-            optimal_softmed_pitlap = optimal_softmed_time.index(optimal_softmed_time) + 1
+            optimal_softmed_pitlap = soft_medium_racetimes.index(optimal_softmed_time) + 1
             optimal_softhard_time = min(soft_hard_racetimes)
-            optimal_softhard_pitlap = optimal_softhard_time.index(optimal_softhard_time) + 1
+            optimal_softhard_pitlap = soft_hard_racetimes.index(optimal_softhard_time) + 1
+            if optimal_softmed_time <= optimal_softhard_time:
+                self.tm.set_optimal_strategy("Soft -> Medium")
+                self.tm.set_optimal_pitlap(optimal_softmed_pitlap)
+            else:
+                self.tm.set_optimal_strategy("Soft -> Hard")
+                self.tm.set_optimal_pitlap(optimal_softhard_pitlap)                
 
 if __name__ == '__main__':
     tm = TyreModel()
