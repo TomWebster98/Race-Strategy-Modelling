@@ -220,14 +220,27 @@ class CommandLine:
         """
         Calculates optimal strategy for defined starting tyre compound, initial laptimes and degradation.
         """
-        # for tyreAge in range(0,self.tm.get_total_lap_number(),1):
-        #     soft_laptimes = self.tm.get_soft_initial_laptime + ()
-        
-        
-        # if self.tm.get_starting_compound == 1:
-        #     for pitLap in range(1,self.tm.get_total_lap_number(),1):
-        #         stint1_times = 
+        soft_laptimes = []
+        medium_laptimes = []
+        hard_laptimes = []
+        for tyreAge in range(1,self.tm.get_total_lap_number(),1):
+            soft_laptimes.append(self.tm.get_soft_initial_laptime() + (self.tm.get_soft_compound_degradation() * (tyreAge-1)))
+            medium_laptimes.append(self.tm.get_medium_initial_laptime() + (self.tm.get_medium_compound_degradation() * (tyreAge-1)))
+            hard_laptimes.append(self.tm.get_hard_initial_laptime() + (self.tm.get_hard_compound_degradation() * (tyreAge-1)))
 
+        if self.tm.get_starting_compound == 1:
+            soft_medium_racetimes = []
+            soft_hard_racetimes = []
+            for pitLap in range(1, self.tm.get_total_lap_number(), 1):
+                stint1_times = soft_laptimes[tyreAge[0:pitLap+1]]
+                stint2_times_Med = medium_laptimes[tyreAge[0:(self.tm.get_total_lap_number()-pitLap)]]
+                stint2_times_Hard = hard_laptimes[tyreAge[0:(self.tm.get_total_lap_number()-pitLap)]]
+                soft_medium_racetimes.append(sum(stint1_times + sum(stint2_times_Med)))
+                soft_hard_racetimes.append(sum(stint1_times + sum(stint2_times_Hard)))
+            optimal_softmed_time = min(soft_medium_racetimes)
+            optimal_softmed_pitlap = optimal_softmed_time.index(optimal_softmed_time) + 1
+            optimal_softhard_time = min(soft_hard_racetimes)
+            optimal_softhard_pitlap = optimal_softhard_time.index(optimal_softhard_time) + 1
 
 if __name__ == '__main__':
     tm = TyreModel()
