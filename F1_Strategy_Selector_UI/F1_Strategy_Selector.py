@@ -261,7 +261,9 @@ class CommandLine:
                 self.tm.set_optimal_pitlap(optimal_softmed_pitlap)
             else:
                 self.tm.set_optimal_strategy("Soft -> Hard")
-                self.tm.set_optimal_pitlap(optimal_softhard_pitlap)                
+                self.tm.set_optimal_pitlap(optimal_softhard_pitlap)
+
+        # Implement fuel correction, alternate starting tyres and correct errors.                
 
 if __name__ == '__main__':
     tm = TyreModel()
