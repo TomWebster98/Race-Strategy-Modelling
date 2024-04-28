@@ -61,7 +61,10 @@ hold off
 %% Evaluate Race Times for all pit laps
 % Parameter sweep for pitstop laps
 
+number_of_pitstops = input("Select Number of Pitstops (1 or 2): ");
 starting_tyre = input("Select Starting Tyre (C4, C3 or C2): ", "s");
+
+if number_of_pitstops == 1
 
 if starting_tyre == "C4"
     raceTimesArray_C4C3 = zeros(1,length(totalLapNumber)-1);
@@ -155,3 +158,38 @@ if starting_tyre == "C2"
     legend(["C2 -> C4","C2 -> C3"],"Location","best")
     grid on
 end
+
+elseif number_of_pitstops == 2
+
+if starting_tyre == "C4" %C4-C4-C2, C4-C2-C2, C4-C2-C4, C4-C4-C3, C4-C3-C3, C4-C3-C4
+    raceTimesArray_C4C4C2 = zeros(length(totalLapNumber)-2,length(totalLapNumber)-1);
+    raceTimesArray_C4C2C4 = zeros(1,length(totalLapNumber)-1);
+    raceTimesArray_C4C2C2 = zeros(1,length(totalLapNumber)-1);
+    raceTimesArray_C4C4C3 = zeros(1,length(totalLapNumber)-1);
+    raceTimesArray_C4C3C4 = zeros(1,length(totalLapNumber)-1);
+    raceTimesArray_C4C3C3 = zeros(1,length(totalLapNumber)-1);
+    for pitLap1 = 1:totalLapNumber-2
+        for pitLap2 = pitLap1+1:totalLapNumber-1
+        fuel_Corrected_Stint1 = C4laptime(tyreAge(1:pitLap1));
+        fuel_Corrected_Stint2_C4 = C4DegLaptime(tyreAge(1:(pitLap2-pitLap1))) - fuelLapCorrections(lapNumber(pitLap1+1:pitLap2));
+        fuel_Corrected_Stint2_C3 = C3DegLaptime(tyreAge(1:(pitLap2-pitLap1))) - fuelLapCorrections(lapNumber(pitLap1+1:pitLap2));
+        fuel_Corrected_Stint2_C2 = C2DegLaptime(tyreAge(1:(pitLap2-pitLap1))) - fuelLapCorrections(lapNumber(pitLap1+1:pitLap2));
+        fuel_Corrected_Stint3_C4 = C4DegLaptime(tyreAge(1:(totalLapNumber-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:totalLapNumber));
+        fuel_Corrected_Stint3_C3 = C3DegLaptime(tyreAge(1:(totalLapNumber-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:totalLapNumber));
+        fuel_Corrected_Stint3_C2 = C2DegLaptime(tyreAge(1:(totalLapNumber-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:totalLapNumber));
+        raceTimesArray_C4C4C2(pitLap1,pitLap2) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C4) + sum(fuel_Corrected_Stint3_C2) + number_of_pitstops*pitTime; % Array where row number is pitlap 1 and column is pitlap2
+        % raceTimesArray_C4C2C4(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C2) + sum(fuel_Corrected_Stint3_C4) + number_of_pitstops*pitTime;
+        % raceTimesArray_C4C2C2(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C2) + sum(fuel_Corrected_Stint3_C2) + number_of_pitstops*pitTime;
+        % raceTimesArray_C4C4C3(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C4) + sum(fuel_Corrected_Stint3_C3) + number_of_pitstops*pitTime;
+        % raceTimesArray_C4C3C4(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C3) + sum(fuel_Corrected_Stint3_C4) + number_of_pitstops*pitTime;
+        % raceTimesArray_C4C3C3(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C3) + sum(fuel_Corrected_Stint3_C3) + number_of_pitstops*pitTime;
+        end
+    end
+    [optimalRaceTime, idx] = min(raceTimesArray_C4C4C2(raceTimesArray_C4C4C2 > 0));
+    [optimalPitLap1, optimalPitLap2] = ind2sub(size(raceTimesArray_C4C4C2), idx);
+    % plot3(lapNumber(1:totalLapNumber-2),lapNumber(2:totalLapNumber-1),raceTimesArray_C4C4C2)
+
+end
+
+end
+
