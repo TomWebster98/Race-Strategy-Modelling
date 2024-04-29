@@ -177,19 +177,63 @@ if starting_tyre == "C4" %C4-C4-C2, C4-C2-C2, C4-C2-C4, C4-C4-C3, C4-C3-C3, C4-C
         fuel_Corrected_Stint3_C4 = C4DegLaptime(tyreAge(1:(totalLapNumber-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:totalLapNumber));
         fuel_Corrected_Stint3_C3 = C3DegLaptime(tyreAge(1:(totalLapNumber-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:totalLapNumber));
         fuel_Corrected_Stint3_C2 = C2DegLaptime(tyreAge(1:(totalLapNumber-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:totalLapNumber));
-        raceTimesArray_C4C4C2(pitLap2,pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C4) + sum(fuel_Corrected_Stint3_C2) + number_of_pitstops*pitTime; % Array where row number is pitlap 1 and column is pitlap2
-        % raceTimesArray_C4C2C4(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C2) + sum(fuel_Corrected_Stint3_C4) + number_of_pitstops*pitTime;
-        % raceTimesArray_C4C2C2(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C2) + sum(fuel_Corrected_Stint3_C2) + number_of_pitstops*pitTime;
-        % raceTimesArray_C4C4C3(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C4) + sum(fuel_Corrected_Stint3_C3) + number_of_pitstops*pitTime;
-        % raceTimesArray_C4C3C4(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C3) + sum(fuel_Corrected_Stint3_C4) + number_of_pitstops*pitTime;
-        % raceTimesArray_C4C3C3(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C3) + sum(fuel_Corrected_Stint3_C3) + number_of_pitstops*pitTime;
+        raceTimesArray_C4C4C2(pitLap2,pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C4) + sum(fuel_Corrected_Stint3_C2) + number_of_pitstops*pitTime;
+        raceTimesArray_C4C2C4(pitLap2,pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C2) + sum(fuel_Corrected_Stint3_C4) + number_of_pitstops*pitTime;
+        raceTimesArray_C4C2C2(pitLap2,pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C2) + sum(fuel_Corrected_Stint3_C2) + number_of_pitstops*pitTime;
+        raceTimesArray_C4C4C3(pitLap2,pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C4) + sum(fuel_Corrected_Stint3_C3) + number_of_pitstops*pitTime;
+        raceTimesArray_C4C3C4(pitLap2,pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C3) + sum(fuel_Corrected_Stint3_C4) + number_of_pitstops*pitTime;
+        raceTimesArray_C4C3C3(pitLap2,pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C3) + sum(fuel_Corrected_Stint3_C3) + number_of_pitstops*pitTime;
         end
     end
-    optimalRaceTime = min(raceTimesArray_C4C4C2(raceTimesArray_C4C4C2 > 0));
-    [optimalPitLap2, optimalPitLap1] = find(raceTimesArray_C4C4C2 == optimalRaceTime);
-    plotData = raceTimesArray_C4C4C2;
-    plotData(plotData==0) = nan; % replace 0 elements with NaN
+    strategyOptions = [min(raceTimesArray_C4C4C2(raceTimesArray_C4C4C2 > 0)), min(raceTimesArray_C4C2C4(raceTimesArray_C4C2C4 > 0)), min(raceTimesArray_C4C2C2(raceTimesArray_C4C2C2 > 0)), min(raceTimesArray_C4C4C3(raceTimesArray_C4C4C3 > 0)), min(raceTimesArray_C4C3C4(raceTimesArray_C4C3C4 > 0)), min(raceTimesArray_C4C3C3(raceTimesArray_C4C3C3 > 0))];
     figure(2)
+    bar(["C4-C4-C2", "C4-C2-C4", "C4-C2-C2", "C4-C4-C3", "C4-C3-C4", "C4-C3-C3"], strategyOptions)
+    ylim([min(strategyOptions)-50, max(strategyOptions)+50])
+    title("Optimal 2-Stop Strategies")
+    ylabel("Race Time (s)")
+    optimal2StopTime = min(strategyOptions);
+    optimal2StopIndex = find(strategyOptions == optimal2StopTime);
+    if numel(optimal2StopIndex) ~= 1
+        optimal2StopIndex = optimal2StopIndex(1);
+    end
+    if optimal2StopIndex == 1
+        optimalRaceTime = min(raceTimesArray_C4C4C2(raceTimesArray_C4C4C2 > 0));
+        [optimalPitLap2, optimalPitLap1] = find(raceTimesArray_C4C4C2 == optimalRaceTime);
+        plotData = raceTimesArray_C4C4C2;
+        plotData(plotData==0) = nan; % replace 0 elements with NaN
+        disp(strcat("Optimal 2 Stop Strategy: C4 -> C4 on Lap: ", num2str(optimalPitLap1), " and C4 -> C2 on Lap: ", num2str(optimalPitLap2)))
+    elseif optimal2StopIndex == 2
+        optimalRaceTime = min(raceTimesArray_C4C2C4(raceTimesArray_C4C2C4 > 0));
+        [optimalPitLap2, optimalPitLap1] = find(raceTimesArray_C4C2C4 == optimalRaceTime);
+        plotData = raceTimesArray_C4C2C4;
+        plotData(plotData==0) = nan; % replace 0 elements with NaN
+        disp(strcat("Optimal 2 Stop Strategy: C4 -> C2 on Lap: ", num2str(optimalPitLap1), " and C2 -> C4 on Lap: ", num2str(optimalPitLap2)))
+    elseif optimal2StopIndex == 3
+        optimalRaceTime = min(raceTimesArray_C4C2C2(raceTimesArray_C4C2C2 > 0));
+        [optimalPitLap2, optimalPitLap1] = find(raceTimesArray_C4C2C2 == optimalRaceTime);
+        plotData = raceTimesArray_C4C2C2;
+        plotData(plotData==0) = nan; % replace 0 elements with NaN
+        disp(strcat("Optimal 2 Stop Strategy: C4 -> C2 on Lap: ", num2str(optimalPitLap1), " and C2 -> C2 on Lap: ", num2str(optimalPitLap2)))
+    elseif optimal2StopIndex == 4
+        optimalRaceTime = min(raceTimesArray_C4C4C3(raceTimesArray_C4C4C3 > 0));
+        [optimalPitLap2, optimalPitLap1] = find(raceTimesArray_C4C4C3 == optimalRaceTime);
+        plotData = raceTimesArray_C4C4C3;
+        plotData(plotData==0) = nan; % replace 0 elements with NaN
+        disp(strcat("Optimal 2 Stop Strategy: C4 -> C4 on Lap: ", num2str(optimalPitLap1), " and C4 -> C3 on Lap: ", num2str(optimalPitLap2)))
+    elseif optimal2StopIndex == 5
+        optimalRaceTime = min(raceTimesArray_C4C3C4(raceTimesArray_C4C3C4 > 0));
+        [optimalPitLap2, optimalPitLap1] = find(raceTimesArray_C4C3C4 == optimalRaceTime);
+        plotData = raceTimesArray_C4C3C4;
+        plotData(plotData==0) = nan; % replace 0 elements with NaN
+        disp(strcat("Optimal 2 Stop Strategy: C4 -> C3 on Lap: ", num2str(optimalPitLap1), " and C3 -> C4 on Lap: ", num2str(optimalPitLap2)))
+    elseif optimal2StopIndex == 6
+        optimalRaceTime = min(raceTimesArray_C4C3C3(raceTimesArray_C4C3C3 > 0));
+        [optimalPitLap2, optimalPitLap1] = find(raceTimesArray_C4C3C3 == optimalRaceTime);
+        plotData = raceTimesArray_C4C3C3;
+        plotData(plotData==0) = nan; % replace 0 elements with NaN
+        disp(strcat("Optimal 2 Stop Strategy: C4 -> C3 on Lap: ", num2str(optimalPitLap1), " and C3 -> C3 on Lap: ", num2str(optimalPitLap2)))
+    end
+    figure(3)
     mesh(plotData)
     colorbar
     xlabel("1st Pit Stop Lap Number")
