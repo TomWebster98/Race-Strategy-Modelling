@@ -177,7 +177,7 @@ if starting_tyre == "C4" %C4-C4-C2, C4-C2-C2, C4-C2-C4, C4-C4-C3, C4-C3-C3, C4-C
         fuel_Corrected_Stint3_C4 = C4DegLaptime(tyreAge(1:(totalLapNumber-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:totalLapNumber));
         fuel_Corrected_Stint3_C3 = C3DegLaptime(tyreAge(1:(totalLapNumber-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:totalLapNumber));
         fuel_Corrected_Stint3_C2 = C2DegLaptime(tyreAge(1:(totalLapNumber-pitLap2))) - fuelLapCorrections(lapNumber(pitLap2+1:totalLapNumber));
-        raceTimesArray_C4C4C2(pitLap1,pitLap2) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C4) + sum(fuel_Corrected_Stint3_C2) + number_of_pitstops*pitTime; % Array where row number is pitlap 1 and column is pitlap2
+        raceTimesArray_C4C4C2(pitLap2,pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C4) + sum(fuel_Corrected_Stint3_C2) + number_of_pitstops*pitTime; % Array where row number is pitlap 1 and column is pitlap2
         % raceTimesArray_C4C2C4(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C2) + sum(fuel_Corrected_Stint3_C4) + number_of_pitstops*pitTime;
         % raceTimesArray_C4C2C2(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C2) + sum(fuel_Corrected_Stint3_C2) + number_of_pitstops*pitTime;
         % raceTimesArray_C4C4C3(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C4) + sum(fuel_Corrected_Stint3_C3) + number_of_pitstops*pitTime;
@@ -185,10 +185,18 @@ if starting_tyre == "C4" %C4-C4-C2, C4-C2-C2, C4-C2-C4, C4-C4-C3, C4-C3-C3, C4-C
         % raceTimesArray_C4C3C3(pitLap1) = sum(fuel_Corrected_Stint1) + sum(fuel_Corrected_Stint2_C3) + sum(fuel_Corrected_Stint3_C3) + number_of_pitstops*pitTime;
         end
     end
-    [optimalRaceTime, idx] = min(raceTimesArray_C4C4C2(raceTimesArray_C4C4C2 > 0));
-    [optimalPitLap1, optimalPitLap2] = ind2sub(size(raceTimesArray_C4C4C2), idx);
-    % plot3(lapNumber(1:totalLapNumber-2),lapNumber(2:totalLapNumber-1),raceTimesArray_C4C4C2)
-
+    optimalRaceTime = min(raceTimesArray_C4C4C2(raceTimesArray_C4C4C2 > 0));
+    [optimalPitLap2, optimalPitLap1] = find(raceTimesArray_C4C4C2 == optimalRaceTime);
+    plotData = raceTimesArray_C4C4C2;
+    plotData(plotData==0) = nan; % replace 0 elements with NaN
+    figure(2)
+    mesh(plotData)
+    colorbar
+    xlabel("1st Pit Stop Lap Number")
+    ylabel("2nd Pit Stop Lap Number")
+    zlabel("Race Time (s)")
+    title("Total Race Time vs 1st and 2nd Pit Stop Laps")
+    grid on
 end
 
 end
